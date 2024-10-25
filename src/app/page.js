@@ -1,8 +1,8 @@
 "use client";
 
-// import { Button } from "@/components/ui/button";
-// import { Input } from "@/components/ui/input";
-// import { Label } from "@/components/ui/label";
+import { Button } from "@/components/ui/button";
+import { Input } from "@/components/ui/input";
+import { Label } from "@/components/ui/label";
 import Link from "next/link";
 import { useState, useEffect } from "react";
 
@@ -13,11 +13,11 @@ export default function Home() {
   const [isTransitioning, setIsTransitioning] = useState(false);
 
   const headlines = [
+    "Create a Trailer for Your Next Blockbuster!",
     "Create Stunning Video Highlights in Seconds",
     "Transform Your Footage into Captivating Trailers",
     "Craft Your Next Viral Video with AI",
     "Turn Hours of Content into Minutes of Magic",
-    "Create a Trailer for Your Next Blockbuster!!!",
   ];
 
   useEffect(() => {
@@ -31,7 +31,7 @@ export default function Home() {
         setCurrentHeadline(headlines[index]);
         setIsTransitioning(false);
       }, 500); // Half of the transition duration
-    }, 5000);
+    }, 3000);
 
     return () => clearInterval(intervalId);
   }, []);
@@ -91,7 +91,7 @@ export default function Home() {
               <div className="flex flex-col justify-center space-y-4">
                 <div className="space-y-2">
                   <h1
-                    className={`text-3xl font-bold tracking-tighter text-blue-800 sm:text-4xl md:text-5xl lg:text-6xl/none min-h-[120px] flex items-center transition-opacity duration-1000 ${
+                    className={`text-3xl font-bold tracking-tighter text-blue-800 sm:text-4xl md:text-5xl min-h-[120px] flex items-center transition-opacity duration-1000 ${
                       isTransitioning ? "opacity-0" : "opacity-100"
                     }`}
                   >
@@ -111,7 +111,7 @@ export default function Home() {
                         Upload your video
                       </Label> */}
                       <div className="flex items-center justify-center w-full">
-                        {/* <label
+                        <label
                           htmlFor="video-upload"
                           className="flex flex-col items-center justify-center w-full h-64 border-2 border-blue-300 border-dashed rounded-lg cursor-pointer bg-blue-50 hover:bg-blue-100"
                         >
@@ -134,15 +134,15 @@ export default function Home() {
                             accept="video/*"
                             onChange={handleFileChange}
                           />
-                        </label> */}
+                        </label>
                       </div>
                     </div>
-                    {/* <Button
+                    <Button
                       type="submit"
                       className="w-full bg-blue-600 text-white hover:bg-blue-700 focus:ring-blue-500"
                     >
                       Create Highlight
-                    </Button> */}
+                    </Button>
                   </form>
                   {file && (
                     <p className="text-sm text-blue-600">
