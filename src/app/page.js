@@ -5,12 +5,16 @@ import { Input } from "@/components/ui/input";
 import { Label } from "@/components/ui/label";
 import Link from "next/link";
 import { useState, useEffect } from "react";
+import axios from "axios";
 
 export default function Home() {
   //   const [file, setFile] = (useState < File) | (null > null);
   const [file, setFile] = useState(null);
   const [currentHeadline, setCurrentHeadline] = useState("");
   const [isTransitioning, setIsTransitioning] = useState(false);
+  const [selectedGenre, setSelectedGenre] = useState("");
+  const [videoData, setVideoData] = useState(null);
+  const [responseData, setResponseData] = useState(null);
 
   const headlines = [
     "Create a Trailer for Your Next Blockbuster!",
@@ -38,14 +42,74 @@ export default function Home() {
 
   const handleFileChange = (event) => {
     if (event.target.files && event.target.files[0]) {
-      setFile(event.target.files[0]);
+      const selectedFile = event.target.files[0];
+      console.log("selected file : ", selectedFile);
+      setFile(selectedFile);
+
+      // const reader = new FileReader();
+      // reader.readAsDataURL(selectedFile);
+      // reader.onload = () => {
+      //   const base64Data = reader.result.split(",")[1];
+      //   console.log(base64Data);
+      //   setVideoData(base64Data); // Save Base64 data for later API calls
+      // };
+
+      // reader.onerror = (error) => {
+      //   console.error("Error reading file:", error);
+      // };
     }
   };
 
-  const handleSubmit = (event) => {
+  const handleSubmit = async (event) => {
     event.preventDefault();
-    // Handle file upload here
-    console.log("File to upload:", file);
+    if (!file) {
+      alert("Please select a file to upload.");
+      return;
+    }
+  };
+
+  const handleGenreChange = async (event) => {
+    const genre = event.target.value;
+    setSelectedGenre(genre);
+
+    if (videoData) {
+      try {
+        const response = await fetch("YOUR_API_ENDPOINT", {
+          method: "POST",
+          headers: {
+            "Content-Type": "application/json",
+          },
+          body: JSON.stringify({ video: videoData, genre }), // Send video and genre
+        });
+
+        if (response.ok) {
+          const data = await response.json();
+          console.log("Upload and genre update successful:", data);
+        } else {
+          console.error("Upload failed:", response.statusText);
+        }
+      } catch (error) {
+        console.error("Error during upload:", error);
+      }
+    }
+  };
+
+  const handleUpload = async () => {
+    const formData = new FormData();
+    formData.append("video", file);
+
+    const response = await axios.post(
+      "http://localhost:3001/upload",
+      formData,
+      {
+        headers: {
+          "Content-Type": "multipart/form-data",
+        },
+      }
+    );
+
+    setResponseData(response.data); // Save response data in a variable
+    console.log("Response data:", response.data);
   };
 
   return (
@@ -86,7 +150,7 @@ export default function Home() {
       </header>
       <main className="flex-1">
         <section className="w-full py-12 md:py-24 lg:py-32 xl:py-48 bg-blue-50">
-          <div className="container px-4 md:px-6">
+          <div className="container mx-auto px-4 md:px-6">
             <div className="grid gap-6 lg:grid-cols-2 lg:gap-12 xl:grid-cols-2">
               <div className="flex flex-col justify-center space-y-4">
                 <div className="space-y-2">
@@ -107,9 +171,6 @@ export default function Home() {
                 <div className="w-full max-w-sm space-y-2">
                   <form onSubmit={handleSubmit} className="space-y-4">
                     <div className="space-y-2">
-                      {/* <Label htmlFor="video-upload" className="text-blue-600">
-                        Upload your video
-                      </Label> */}
                       <div className="flex items-center justify-center w-full">
                         <label
                           htmlFor="video-upload"
@@ -127,7 +188,7 @@ export default function Home() {
                               MP4, AVI, MOV (MAX. 800MB)
                             </p>
                           </div>
-                          <Input
+                          <input
                             id="video-upload"
                             type="file"
                             className="hidden"
@@ -137,13 +198,26 @@ export default function Home() {
                         </label>
                       </div>
                     </div>
-                    <Button
-                      type="submit"
-                      className="w-full bg-blue-600 text-white hover:bg-blue-700 focus:ring-blue-500"
+                    <select
+                      value={selectedGenre}
+                      onChange={handleGenreChange}
+                      className="w-full bg-white border border-blue-300 p-2 rounded-sm text-blue-600 focus:ring-blue-500"
                     >
-                      Create Highlight
-                    </Button>
+                      <option value="">Select Genre</option>
+                      <option value="action">Action</option>
+                      <option value="drama">Drama</option>
+                      <option value="comedy">Comedy</option>
+                      <option value="horror">Horror</option>
+                      <option value="documentary">Documentary</option>
+                    </select>
+                    <button
+                      className="text-white bg-blue-700 hover:bg-blue-800 focus:ring-4 focus:ring-blue-300 font-medium rounded-lg text-sm px-5 py-2.5 me-2 mb-2 dark:bg-blue-600 dark:hover:bg-blue-700 focus:outline-none dark:focus:ring-blue-800"
+                      onClick={handleUpload}
+                    >
+                      Upload
+                    </button>
                   </form>
+
                   {file && (
                     <p className="text-sm text-blue-600">
                       Selected file: {file.name}
@@ -155,7 +229,7 @@ export default function Home() {
           </div>
         </section>
         <section className="w-full py-12 md:py-24 lg:py-32 bg-white">
-          <div className="container px-4 md:px-6">
+          <div className="container mx-auto px-4 md:px-6">
             <div className="flex flex-col items-center justify-center space-y-4 text-center">
               <div className="space-y-2">
                 <h2 className="text-3xl font-bold tracking-tighter text-blue-800 md:text-4xl">
@@ -204,7 +278,7 @@ export default function Home() {
           </div>
         </section>
         <section className="w-full py-12 md:py-24 lg:py-32 bg-blue-50">
-          <div className="container px-4 md:px-6">
+          <div className="container mx-auto px-4 md:px-6">
             <div className="flex flex-col items-center justify-center space-y-4 text-center">
               <div className="space-y-2">
                 <h2 className="text-3xl font-bold tracking-tighter text-blue-800 md:text-4xl">
